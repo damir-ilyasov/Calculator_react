@@ -1,16 +1,14 @@
-# React + Vite
+Студент: Ильясов Дамир
+Группа: ЭФБО-08-24
+Контрольная работа №4
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Описание: Это простой ИМТ калькулятор
+ИМТ рассчитывается по стандартной формуле: ИМТ = вес (кг) / (рост (м) × рост (м))
+Категории ИМТ:
+          < 18.5 - Недостаточный вес
+          18.5 - 24.9 - Нормальный вес
+          25 - 29.9 - Избыточный вес
+          ≥ 30 - Ожирение
+<img width="1910" height="1090" alt="image" src="https://github.com/user-attachments/assets/38ca5c94-49c3-4a33-9bd3-85f19216e5ba" />
+<img width="1918" height="1097" alt="image" src="https://github.com/user-attachments/assets/f7d92ba8-85b9-4bd4-90f3-8cbf45e4bc31" />
+<img width="1919" height="1085" alt="image" src="https://github.com/user-attachments/assets/e5927c98-87cf-449e-9c19-52bc7b665d25" />
