@@ -4,13 +4,11 @@ import validateBMIInput from '../middleware/validateInput.js';
 
 const router = express.Router();
 
-// Маршруты
 router.post('/calculate', validateBMIInput, bmiController.calculate);
 router.get('/history', bmiController.getHistory);
 router.get('/stats', bmiController.getStats);
 router.delete('/history', bmiController.clearHistory);
 
-// Пример с параметрами URL
 router.get('/category/:bmiValue', (req, res) => {
   const bmiValue = parseFloat(req.params.bmiValue);
   

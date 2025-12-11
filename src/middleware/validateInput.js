@@ -34,7 +34,6 @@ const validateBMIInput = (req, res, next) => {
     });
   }
   
-  // Добавляем проверенные данные в запрос
   req.validatedData = {
     height: heightNum,
     weight: weightNum

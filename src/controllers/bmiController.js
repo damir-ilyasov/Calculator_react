@@ -1,7 +1,5 @@
-// Для упрощения, будем хранить данные в памяти
 let bmiHistory = [];
 
-// Рассчет ИМТ и категории
 const calculateBMI = (height, weight) => {
   const heightInMeters = height / 100;
   const bmi = weight / (heightInMeters * heightInMeters);
@@ -39,13 +37,11 @@ const calculateBMI = (height, weight) => {
   };
 };
 
-// Контроллеры
 export const calculate = async (req, res) => {
   try {
     const { height, weight } = req.validatedData;
     const result = calculateBMI(height, weight);
     
-    // Сохраняем в историю (в памяти)
     bmiHistory.push(result);
     
     res.json({
@@ -63,7 +59,6 @@ export const calculate = async (req, res) => {
 
 export const getHistory = async (req, res) => {
   try {
-    // Поддержка пагинации через query параметры
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const startIndex = (page - 1) * limit;
@@ -106,7 +101,6 @@ export const getStats = async (req, res) => {
     const totalBMI = bmiHistory.reduce((sum, item) => sum + parseFloat(item.bmi), 0);
     const averageBMI = (totalBMI / bmiHistory.length).toFixed(1);
     
-    // Находим наиболее частую категорию
     const categoryCount = {};
     bmiHistory.forEach(item => {
       categoryCount[item.category] = (categoryCount[item.category] || 0) + 1;
