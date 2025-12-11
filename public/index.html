@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор ИМТ API</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #444;
+            margin: 20px 0 10px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .calculator {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        button.secondary {
+            background: #2196F3;
+        }
+
+        button.secondary:hover {
+            background: #0b7dda;
+        }
+
+        button.danger {
+            background: #f44336;
+        }
+
+        button.danger:hover {
+            background: #da190b;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .result.error {
+            background: #ffebee;
+            border-left-color: #f44336;
+        }
+
+        .api-info {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .endpoint {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #2196F3;
+        }
+
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+            color: #333;
+        }
+
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        .actions {
+            margin: 20px 0;
+        }
+
+        .history-item {
+            background: white;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .history-item.underweight {
+            border-left-color: #2196F3;
+        }
+
+        .history-item.overweight {
+            border-left-color: #FF9800;
+        }
+
+        .history-item.obese {
+            border-left-color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Калькулятор ИМТ - Express.js API</h1>
+        
+        <div class="calculator">
+            <h2>Рассчитать ИМТ</h2>
+            <div class="input-group">
+                <label for="height">Рост (см):</label>
+                <input type="number" id="height" placeholder="Введите рост" min="50" max="300">
+            </div>
+            <div class="input-group">
+                <label for="weight">Вес (кг):</label>
+                <input type="number" id="weight" placeholder="Введите вес" min="20" max="500">
+            </div>
+            <button onclick="calculateBMI()">Рассчитать ИМТ</button>
+            <div id="result"></div>
+        </div>
+
+        <div class="actions">
+            <h2>Действия</h2>
+            <button onclick="getHistory()" class="secondary">Показать историю</button>
+            <button onclick="getStats()" class="secondary">Статистика</button>
+            <button onclick="clearHistory()" class="danger">Очистить историю</button>
+        </div>
+
+        <div id="dataDisplay"></div>
+
+        <div class="api-info">
+            <h2>Доступные API endpoints</h2>
+            
+            <div class="endpoint">
+                <code>POST /api/bmi/calculate</code>
+                <p>Рассчитать ИМТ</p>
+                <pre>{
+    "height": 175,
+    "weight": 70
+}</pre>
+            </div>
+            
+            <div class="endpoint">
+                <code>GET /api/bmi/history?page=1&limit=10</code>
+                <p>Получить историю расчетов с пагинацией</p>
+            </div>
+            
+            <div class="endpoint">
+                <code>GET /api/bmi/stats</code>
+                <p>Получить статистику расчетов</p>
+            </div>
+            
+            <div class="endpoint">
+                <code>DELETE /api/bmi/history</code>
+                <p>Очистить историю расчетов</p>
+            </div>
+            
+            <div class="endpoint">
+                <code>GET /api/bmi/category/24.5</code>
+                <p>Определить категорию по значению ИМТ</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Базовый URL API
+        const API_URL = '/api/bmi';
+
+        async function calculateBMI() {
+            const height = document.getElementById('height').value;
+            const weight = document.getElementById('weight').value;
+
+            if (!height || !weight) {
+                showResult('Пожалуйста, заполните все поля', true);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/calculate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ height, weight })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const { bmi, category, height: h, weight: w } = data.data;
+                    let categoryClass = '';
+                    
+                    if (category.includes('Недостаточный')) categoryClass = 'underweight';
+                    else if (category.includes('Нормальный')) categoryClass = '';
+                    else if (category.includes('Избыточный')) categoryClass = 'overweight';
+                    else if (category.includes('Ожирение')) categoryClass = 'obese';
+                    
+                    showResult(`
+                        <div class="result ${categoryClass}">
+                            <h3>Результат расчета</h3>
+                            <p><strong>ИМТ:</strong> ${bmi}</p>
+                            <p><strong>Категория:</strong> ${category}</p>
+                            <p><strong>Рост:</strong> ${h} см, <strong>Вес:</strong> ${w} кг</p>
+                        </div>
+                    `, false);
+                } else {
+                    showResult(data.error, true);
+                }
+            } catch (error) {
+                showResult('Ошибка соединения с сервером', true);
+            }
+        }
+
+        async function getHistory() {
+            try {
+                const response = await fetch(`${API_URL}/history?limit=5`);
+                const data = await response.json();
+
+                if (data.success && data.data.length > 0) {
+                    let html = '<h3>История расчетов:</h3>';
+                    data.data.forEach(item => {
+                        let categoryClass = '';
+                        if (item.category.includes('Недостаточный')) categoryClass = 'underweight';
+                        else if (item.category.includes('Избыточный')) categoryClass = 'overweight';
+                        else if (item.category.includes('Ожирение')) categoryClass = 'obese';
+                        
+                        html += `
+                            <div class="history-item ${categoryClass}">
+                                <p><strong>ИМТ:</strong> ${item.bmi} | <strong>Категория:</strong> ${item.category}</p>
+                                <p><small>Рост: ${item.height} см, Вес: ${item.weight} кг</small></p>
+                                <p><small>${new Date(item.timestamp).toLocaleString('ru-RU')}</small></p>
+                            </div>
+                        `;
+                    });
+                    
+                    document.getElementById('dataDisplay').innerHTML = html;
+                } else {
+                    document.getElementById('dataDisplay').innerHTML = '<p>История расчетов пуста</p>';
+                }
+            } catch (error) {
+                document.getElementById('dataDisplay').innerHTML = 
+                    '<div class="result error">Ошибка при получении истории</div>';
+            }
+        }
+
+        async function getStats() {
+            try {
+                const response = await fetch(`${API_URL}/stats`);
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('dataDisplay').innerHTML = `
+                        <div class="result">
+                            <h3>Статистика</h3>
+                            <p><strong>Всего расчетов:</strong> ${data.data.totalCalculations}</p>
+                            <p><strong>Средний ИМТ:</strong> ${data.data.averageBMI}</p>
+                            <p><strong>Наиболее частая категория:</strong> ${data.data.mostCommonCategory}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('dataDisplay').innerHTML = 
+                    '<div class="result error">Ошибка при получении статистики</div>';
+            }
+        }
+
+        async function clearHistory() {
+            if (confirm('Вы уверены, что хотите очистить всю историю расчетов?')) {
+                try {
+                    const response = await fetch(`${API_URL}/history`, {
+                        method: 'DELETE'
+                    });
+                    const data = await response.json();
+
+                    if (data.success) {
+                        alert(data.message);
+                        document.getElementById('dataDisplay').innerHTML = '';
+                    }
+                } catch (error) {
+                    alert('Ошибка при очистке истории');
+                }
+            }
+        }
+
+        function showResult(message, isError = false) {
+            const resultDiv = document.getElementById('result');
+            if (isError) {
+                resultDiv.innerHTML = `<div class="result error">${message}</div>`;
+            } else {
+                resultDiv.innerHTML = message;
+            }
+        }
+
+        // Тестирование API при загрузке
+        window.onload = async () => {
+            try {
+                const response = await fetch('/api/test');
+                if (response.ok) {
+                    console.log('API работает корректно');
+                }
+            } catch (error) {
+                console.log('API не отвечает');
+            }
+        };
+    </script>
+</body>
+</html>
